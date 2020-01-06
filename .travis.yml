@@ -1,0 +1,12 @@
+anguage: go
+
+go:
+  - 1.12.2
+
+sudo: required
+
+install:
+  - echo "install"
+
+script:
+  - echo "script"
