@@ -2,9 +2,10 @@ package subscriber
 
 import (
 	"context"
+
 	log "github.com/micro/go-micro/v2/logger"
 
-	admin "admin-srv/proto/admin"
+	admin "doudou/admin-srv/proto/admin"
 )
 
 type Admin struct{}

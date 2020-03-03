@@ -1,39 +1,24 @@
 package main
 
 import (
-	"admin-srv/handler"
-	"admin-srv/subscriber"
-	"time"
+	"doudou/admin-srv/handler"
 
-	admin "admin-srv/proto/admin"
+	admin "doudou/admin-srv/proto/admin"
 
-	"github.com/micro/go-micro/v2"
+	"doudou/pkg/microplus"
+
 	log "github.com/micro/go-micro/v2/logger"
-	"github.com/micro/go-micro/v2/registry"
-	"github.com/micro/go-micro/v2/registry/etcd"
-	"github.com/micro/go-micro/v2/service/grpc"
+	"github.com/micro/go-micro/v2/service"
 )
 
 func main() {
-	/************************************/
-	/********** 服务发现  etcd   ********/
-	/************************************/
-	reg := etcd.NewRegistry(func(op *registry.Options) {
-		op.Addrs = []string{
-			"http://127.0.0.1:2379",
-		}
-		op.Timeout = 5 * time.Second
-	})
+
 	/************************************/
 	/********** New GRPC Service   ********/
 	/************************************/
 	// New Service
-	service := grpc.NewService(
-		micro.Name("com.lcb123.srv.admin"),
-		micro.Registry(reg),
-		micro.RegisterTTL(time.Second*15),      //重新注册时间
-		micro.RegisterInterval(time.Second*10), //注册过期时间
-		micro.Version("latest"),
+	service := microplus.NewService(
+		service.Name("com.lcb123.srv.admin"),
 	)
 
 	// Initialise service
@@ -43,7 +28,7 @@ func main() {
 	admin.RegisterAdminHandler(service.Server(), new(handler.Admin))
 
 	// Register Struct as Subscriber
-	micro.RegisterSubscriber("com.lcb123.srv.admin", service.Server(), new(subscriber.Admin))
+	// micro.RegisterSubscriber("com.lcb123.srv.admin", service.Server(), new(subscriber.Admin))
 
 	// Run service
 	if err := service.Run(); err != nil {

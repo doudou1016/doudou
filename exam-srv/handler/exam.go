@@ -5,7 +5,9 @@ import (
 
 	log "github.com/micro/go-micro/v2/logger"
 
-	exam "exam-srv/proto/exam"
+	pb "doudou/admin-srv/proto/admin"
+	exam "doudou/exam-srv/proto/exam"
+	"doudou/pkg/microplus"
 )
 
 type Exam struct{}
@@ -13,7 +15,11 @@ type Exam struct{}
 // Call is a single request handler called via client.Call or the generated client code
 func (e *Exam) Call(ctx context.Context, req *exam.Request, rsp *exam.Response) error {
 	log.Info("Received Exam.Call request")
-	rsp.Msg = "Hello " + req.Name
+	adminClient := pb.NewAdminService("com.lcb123.srv.admin", microplus.NewClient())
+	rsp1, _ := adminClient.Call(ctx, &pb.Request{
+		Name: "123456",
+	})
+	rsp.Msg = "exam_srv " + rsp1.Msg
 	return nil
 }
 

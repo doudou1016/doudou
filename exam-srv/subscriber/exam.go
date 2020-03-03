@@ -2,9 +2,10 @@ package subscriber
 
 import (
 	"context"
+
 	log "github.com/micro/go-micro/v2/logger"
 
-	exam "exam-srv/proto/exam"
+	exam "doudou/exam-srv/proto/exam"
 )
 
 type Exam struct{}

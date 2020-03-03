@@ -5,7 +5,7 @@ import (
 
 	log "github.com/micro/go-micro/v2/logger"
 
-	admin "admin-srv/proto/admin"
+	admin "doudou/admin-srv/proto/admin"
 )
 
 type Admin struct{}
@@ -13,7 +13,7 @@ type Admin struct{}
 // Call is a single request handler called via client.Call or the generated client code
 func (e *Admin) Call(ctx context.Context, req *admin.Request, rsp *admin.Response) error {
 	log.Info("Received Admin.Call request")
-	rsp.Msg = "Hello " + req.Name
+	rsp.Msg = "admin_srv " + req.Name
 	return nil
 }
 
