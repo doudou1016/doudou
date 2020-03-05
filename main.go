@@ -2,33 +2,41 @@ package main
 
 import (
 	"doudou/pkg/errors"
-	"doudou/pkg/ginplus"
-	"doudou/pkg/jwtplus"
-	"doudou/pkg/redisplus"
+	"fmt"
 
+	ginplus "github.com/dllgo/go-gin"
+	jwtplus "github.com/dllgo/go-jwt"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	InitDb()
-	router := InitWeb()
-	router.GET("/login", login) // hello函数处理"/hello"请求
-	router.GET("/hello", hello) // hello函数处理"/hello"请求
-	// 指定地址和端口号
-	router.Run(":9090")
+	mconf := ginplus.Config{Address: ":9090", ReadTimeout: 30, WriteTimeout: 30}
+	httpserver, err := ginplus.NewServerHttp(mconf)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	httpserver.Router = InitRouter()
+	err = httpserver.Listen()
+	defer httpserver.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
-func InitWeb() *gin.Engine {
-	gin.SetMode("debug")
-	app := gin.Default()
-	app.Use(ginplus.CorsMiddleware())
-	app.Use(ginplus.LogMiddleware())
-	app.Use(ginplus.AuthMiddleware(ginplus.AllowMethodAndPathPrefixSkipper(
+func InitRouter() *gin.Engine {
+	router := gin.New()
+	router.NoRoute(ginplus.NoRouteHandler())
+	router.NoMethod(ginplus.NoMethodHandler())
+	router.Use(ginplus.CorsMiddleware())
+	router.Use(ginplus.LogMiddleware())
+	router.Use(ginplus.AuthMiddleware(ginplus.AllowMethodAndPathPrefixSkipper(
 		ginplus.JoinRouter("GET", "/login"),
 	)))
-	return app
-}
-func InitDb() {
-	redisplus.NewRedisWithDefualtConfig()
+	//注册api
+	router.GET("/login", login)
+	router.GET("/hello", hello)
+	return router
 }
 func login(context *gin.Context) {
 	println(">>>> login start <<<<")
@@ -40,12 +48,10 @@ func login(context *gin.Context) {
 		return
 	}
 	ginplus.ResOK(context, token)
-	jwtplus.DestroyToken(token)
 }
 func hello(context *gin.Context) {
 	println(">>>> hello function start <<<<")
 
 	ginplus.ResOK(context, nil)
 	ginplus.ResList(context, nil, 0)
-	ginplus.ResError(context, nil)
 }
