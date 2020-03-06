@@ -1,15 +1,25 @@
 package main
 
 import (
-	"doudou/pkg/errors"
 	"fmt"
+
+	"doudou/pkg/gormplus"
 
 	ginplus "github.com/dllgo/go-gin"
 	jwtplus "github.com/dllgo/go-jwt"
+	redisplus "github.com/dllgo/go-redis"
 	"github.com/gin-gonic/gin"
 )
 
+func init() {
+	//
+	redisplus.DefaultClient()
+	//
+	gormplus.MustDB()
+}
 func main() {
+	//
+
 	mconf := ginplus.Config{Address: ":9090", ReadTimeout: 30, WriteTimeout: 30}
 	httpserver, err := ginplus.NewServerHttp(mconf)
 	if err != nil {
@@ -24,6 +34,7 @@ func main() {
 		return
 	}
 }
+
 func InitRouter() *gin.Engine {
 	router := gin.New()
 	router.NoRoute(ginplus.NoRouteHandler())
@@ -43,7 +54,6 @@ func login(context *gin.Context) {
 	token, err := jwtplus.GenToken(&jwtplus.Userdata{UserId: "123456"})
 	if err != nil {
 		println(">>>> login start 3<<<<")
-		errors.WithStack(err)
 		ginplus.ResError(context, err)
 		return
 	}
